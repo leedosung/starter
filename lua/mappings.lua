@@ -10,4 +10,4 @@ local map = vim.keymap.set
 map("i", "jk", "<ESC>")
 map("n", "<Leader>jq", "<cmd>%!jq<cr>", { desc = "Format JSON" })
 map("n", "<Leader>jc", "<cmd>%!jq -c<cr>", { desc = "Format JSON (compact)" })
-map("n", "<Leader>tr", "<cmd>Telescope resume<cr>", { desc = "Telescope resume" })
+map("n", "<Leader>fr", "<cmd>Telescope resume<cr>", { desc = "Telescope resume" })
