@@ -30,17 +30,5 @@ return {
         { name = "path",     group_index = 2 },
       }
     }
-  },
-  {
-    "CopilotC-Nvim/CopilotChat.nvim",
-    branch = "canary",
-    lazy = false,
-    dependencies = {
-      { "nvim-lua/plenary.nvim" },
-      { "zbirenbaum/copilot.lua" },
-    },
-    opts = {
-      debug = true
-    }
   }
 }
