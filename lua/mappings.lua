@@ -16,6 +16,8 @@ map("n", "<Leader>xc", "<cmd>%!xmllint --noblanks -<cr>", { desc = "Minify XML" 
 
 map("n", "<Leader>fr", "<cmd>Telescope resume<cr>", { desc = "Telescope resume" })
 
-map("n", "<Leader>da", "<cmd>windo diffthis<cr>", { desc = "Buffer all windows diff" })
-map("n", "<Leader>do", "<cmd>windo diffoff<cr>", { desc = "Buffer all windows diff off" })
-map("n", "<Leader>du", "<cmd>windo diffupdate<cr>", { desc = "Buffer all windows diff update" })
+-- map("n", "<Leader>da", "<cmd>windo diffthis<cr>", { desc = "Buffer all windows diff" })
+-- map("n", "<Leader>do", "<cmd>windo diffoff<cr>", { desc = "Buffer all windows diff off" })
+-- map("n", "<Leader>du", "<cmd>windo diffupdate<cr>", { desc = "Buffer all windows diff update" })
+
+map("n", "<Leader>mv", "<cmd>vsplit | term glow %<cr>", { desc = "Markdown view" })

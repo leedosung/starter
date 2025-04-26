@@ -2,55 +2,55 @@ return {
   {
     "stevearc/conform.nvim",
     -- event = 'BufWritePre', -- uncomment for format on save
-    config = function()
-      require "configs.conform"
-    end,
+    opts = require "configs.conform",
   },
 
   -- These are some examples, uncomment them if you want to see them work!
   {
     "neovim/nvim-lspconfig",
+    dependencies = {
+      "williamboman/mason.nvim",
+      "williamboman/mason-lspconfig.nvim",
+    },
     config = function()
-      require("nvchad.configs.lspconfig").defaults()
+      require "configs.mason"
       require "configs.lspconfig"
     end,
   },
 
   {
-    "williamboman/mason.nvim",
-    opts = {
-      ensure_installed = {
-        "typescript-language-server",
-        "bash-language-server",
-        "lua-language-server",
-        "stylua",
-        "html-lsp",
-        "css-lsp",
-        "json-lsp",
-        "eslint-lsp",
-        "prettier",
-        "shfmt",
-        "shellcheck",
-        "yaml-language-server",
-        "yamllint",
-        "eslint_d"
-      },
+    "jay-babu/mason-null-ls.nvim",
+    event = { "BufReadPre", "BufNewFile" },
+    dependencies = {
+      "williamboman/mason.nvim",
+      "nvimtools/none-ls.nvim",
     },
+    config = function()
+      require "configs.mason-null-ls"
+    end,
   },
 
   {
     "nvim-treesitter/nvim-treesitter",
-    opts = {
-      ensure_installed = {
-        "vim",
-        "lua",
-        "vimdoc",
-        "html",
-        "css",
-        "json",
-        "javascript",
-        "typescript"
-      },
+    build = ":TSUpdate",
+    dependencies = {
+      "nvim-treesitter/nvim-treesitter-textobjects",
     },
-  },
+    config = function()
+      require "configs.treesitter"
+    end,
+  }
+
+  -- test new blink
+  -- { import = "nvchad.blink.lazyspec" },
+
+  -- {
+  -- 	"nvim-treesitter/nvim-treesitter",
+  -- 	opts = {
+  -- 		ensure_installed = {
+  -- 			"vim", "lua", "vimdoc",
+  --      "html", "css"
+  -- 		},
+  -- 	},
+  -- },
 }
