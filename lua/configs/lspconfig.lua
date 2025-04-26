@@ -14,6 +14,10 @@ local on_attach = function(client, bufnr)
     virtual_text = {
       prefix = "●",
       spacing = 4,
+      severity = {
+        min = vim.diagnostic.severity.ERROR,
+        max = vim.diagnostic.severity.ERROR,
+      },
     },
     signs = true,
     underline = true,

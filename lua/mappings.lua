@@ -21,3 +21,38 @@ map("n", "<Leader>fr", "<cmd>Telescope resume<cr>", { desc = "Telescope resume" 
 -- map("n", "<Leader>du", "<cmd>windo diffupdate<cr>", { desc = "Buffer all windows diff update" })
 
 map("n", "<Leader>mv", "<cmd>vsplit | term glow %<cr>", { desc = "Markdown view" })
+
+-- map("n", "<Leader>s", function()
+--   local current = vim.diagnostic.config().virtual_text
+--   vim.diagnostic.config({ virtual_text = not current })
+-- end, { desc = "Toggle virtual text (errors/hints)" })
+
+local show_other_diagnostics = false
+
+map("n", "<Leader>l", function()
+  if show_other_diagnostics then
+    vim.diagnostic.config({
+      virtual_text = {
+        severity = {
+          min = vim.diagnostic.severity.ERROR,
+          max = vim.diagnostic.severity.ERROR,
+        },
+      },
+      signs = true,
+      underline = true,
+    })
+  else
+    vim.diagnostic.config({
+      virtual_text = {
+        severity = {
+          min = vim.diagnostic.severity.HINT,
+          max = vim.diagnostic.severity.ERROR,
+        },
+      },
+      signs = true,
+      underline = true,
+    })
+  end
+  show_other_diagnostics = not show_other_diagnostics
+end, { desc = "Toggle other diagnostics (errors always on)" })
+
