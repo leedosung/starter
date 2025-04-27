@@ -7,3 +7,6 @@ require "nvchad.options"
 
 vim.opt.whichwrap = "b,s"
 vim.opt.mouse = ""
+
+-- gitsigns disable
+vim.opt.signcolumn = "no"

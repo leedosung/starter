@@ -16,16 +16,11 @@ map("n", "<Leader>xc", "<cmd>%!xmllint --noblanks -<cr>", { desc = "Minify XML" 
 
 map("n", "<Leader>fr", "<cmd>Telescope resume<cr>", { desc = "Telescope resume" })
 
--- map("n", "<Leader>da", "<cmd>windo diffthis<cr>", { desc = "Buffer all windows diff" })
--- map("n", "<Leader>do", "<cmd>windo diffoff<cr>", { desc = "Buffer all windows diff off" })
--- map("n", "<Leader>du", "<cmd>windo diffupdate<cr>", { desc = "Buffer all windows diff update" })
-
 map("n", "<Leader>mv", "<cmd>vsplit | term glow %<cr>", { desc = "Markdown view" })
 
--- map("n", "<Leader>s", function()
---   local current = vim.diagnostic.config().virtual_text
---   vim.diagnostic.config({ virtual_text = not current })
--- end, { desc = "Toggle virtual text (errors/hints)" })
+map("n", "<leader>h", "<cmd>ToggleTerm direction=horizontal<CR>", { desc = "horizontal terminal" })
+map("n", "<leader>v", "<cmd>ToggleTerm direction=vertical size=60<CR>", { desc = "vertical terminal" })
+map("n", "<leader>o", "<cmd>ToggleTerm direction=float size=80<CR>", { desc = "flaot terminal" })
 
 local show_other_diagnostics = false
 
@@ -41,6 +36,7 @@ map("n", "<Leader>l", function()
       signs = false,
       underline = true,
     })
+    vim.opt.signcolumn = "no"
   else
     vim.diagnostic.config({
       virtual_text = {
@@ -52,7 +48,32 @@ map("n", "<Leader>l", function()
       signs = true,
       underline = true,
     })
+    vim.opt.signcolumn = "yes"
   end
   show_other_diagnostics = not show_other_diagnostics
-end, { desc = "Toggle other diagnostics (errors always on)" })
+end, { desc = "toggle error message (errors/hints)" })
 
+-- terminal mode mappings
+local term_opts = { noremap = true, silent = true }
+
+vim.api.nvim_create_autocmd({"BufEnter", "WinEnter"}, {
+  pattern = "term://*",
+  command = "startinsert"
+})
+
+local function smart_move(cmd)
+  local mode = vim.api.nvim_get_mode().mode
+  if mode == "t" then
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-\\><C-N>", true, false, true), "n", true)
+  end
+  vim.cmd("wincmd " .. cmd)
+end
+
+map("n", "<C-h>", function() smart_move("h") end, term_opts)
+map("n", "<C-j>", function() smart_move("j") end, term_opts)
+map("n", "<C-k>", function() smart_move("k") end, term_opts)
+map("n", "<C-l>", function() smart_move("l") end, term_opts)
+map("t", "<C-h>", function() smart_move("h") end, term_opts)
+map("t", "<C-j>", function() smart_move("j") end, term_opts)
+map("t", "<C-k>", function() smart_move("k") end, term_opts)
+map("t", "<C-l>", function() smart_move("l") end, term_opts)
