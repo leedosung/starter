@@ -19,7 +19,7 @@ local on_attach = function(client, bufnr)
         max = vim.diagnostic.severity.ERROR,
       },
     },
-    signs = true,
+    signs = false,
     underline = true,
     update_in_insert = false,
   })

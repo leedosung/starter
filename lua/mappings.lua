@@ -38,7 +38,7 @@ map("n", "<Leader>l", function()
           max = vim.diagnostic.severity.ERROR,
         },
       },
-      signs = true,
+      signs = false,
       underline = true,
     })
   else
