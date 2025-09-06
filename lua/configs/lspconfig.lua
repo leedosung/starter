@@ -1,55 +1,19 @@
--- require("nvchad.configs.lspconfig").defaults()
--- local servers = { "html", "cssls", "ts_ls", "eslint", "jsonls", "bashls", "clangd", "yamlls" }
--- vim.lsp.enable(servers)
-
--- local on_attach = require("nvchad.configs.lspconfig").on_attach
-local on_init = require("nvchad.configs.lspconfig").on_init
-local capabilities = require("nvchad.configs.lspconfig").capabilities
-local lspconfig = require "lspconfig"
-
-local on_attach = function(client, bufnr)
-  require("nvchad.configs.lspconfig").on_attach(client, bufnr)
-
-  vim.diagnostic.config({
-    virtual_text = {
-      prefix = "●",
-      spacing = 4,
-      severity = {
-        min = vim.diagnostic.severity.ERROR,
-        max = vim.diagnostic.severity.ERROR,
-      },
-    },
-    signs = false,
-    underline = true,
-    update_in_insert = false,
-  })
-end
+require("nvchad.configs.lspconfig").defaults()
 
 local servers = {
   "html",
   "cssls",
-  "ts_ls",
+  "ts_ls", -- typescript-language-server
+  "eslint", -- eslint_d
   "clangd",
-  "eslint",
   "jsonls",
   "bashls",
   "yamlls",
   "marksman",
   "lua_ls",
-  "rust_analyzer",
-  "ansiblels",
   "terraformls",
-  "graphql",
-  "prismals",
-  "dockerls",
-  "taplo",
-  "sqlls"
+  "dockerls"
 }
+vim.lsp.enable(servers)
 
-for _, lsp in ipairs(servers) do
-  lspconfig[lsp].setup {
-    on_attach = on_attach,
-    on_init = on_init,
-    capabilities = capabilities,
-  }
-end
+-- read :h vim.lsp.config for changing options of lsp servers 

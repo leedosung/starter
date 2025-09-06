@@ -4,13 +4,14 @@ require "nvchad.mappings"
 
 local map = vim.keymap.set
 
+-- map("n", ";", ":", { desc = "CMD enter command mode" })
+map("i", "jk", "<ESC>")
+
 -- map({ "n", "i", "v" }, "<C-s>", "<cmd> w <cr>")
 --
 -- map("n", ";", ":", { desc = "CMD enter command mode" })
 map("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "LSP code action" })
 map("n", "<leader>cf", vim.lsp.buf.format, { desc = "LSP format" })
-
-map("i", "jk", "<ESC>")
 map("n", "<Leader>jf", "<cmd>%!jq<cr>", { desc = "Format JSON" })
 map("n", "<Leader>jc", "<cmd>%!jq -c<cr>", { desc = "Minify JSON" })
 

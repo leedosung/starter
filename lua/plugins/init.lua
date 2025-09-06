@@ -8,25 +8,16 @@ return {
   -- These are some examples, uncomment them if you want to see them work!
   {
     "neovim/nvim-lspconfig",
-    dependencies = {
-      "williamboman/mason.nvim",
-      "williamboman/mason-lspconfig.nvim",
-    },
     config = function()
-      require "configs.mason"
       require "configs.lspconfig"
     end,
   },
 
   {
-    "jay-babu/mason-null-ls.nvim",
+    "mfussenegger/nvim-lint",
     event = { "BufReadPre", "BufNewFile" },
-    dependencies = {
-      "williamboman/mason.nvim",
-      "nvimtools/none-ls.nvim",
-    },
     config = function()
-      require "configs.mason-null-ls"
+      require "configs.lint"
     end,
   },
 
@@ -39,7 +30,7 @@ return {
     config = function()
       require "configs.treesitter"
     end,
-  }
+  },
 
   -- test new blink
   -- { import = "nvchad.blink.lazyspec" },
