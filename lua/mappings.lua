@@ -7,6 +7,9 @@ local map = vim.keymap.set
 -- map({ "n", "i", "v" }, "<C-s>", "<cmd> w <cr>")
 --
 -- map("n", ";", ":", { desc = "CMD enter command mode" })
+map("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "LSP code action" })
+map("n", "<leader>cf", vim.lsp.buf.format, { desc = "LSP format" })
+
 map("i", "jk", "<ESC>")
 map("n", "<Leader>jf", "<cmd>%!jq<cr>", { desc = "Format JSON" })
 map("n", "<Leader>jc", "<cmd>%!jq -c<cr>", { desc = "Minify JSON" })
@@ -77,3 +80,28 @@ map("t", "<C-h>", function() smart_move("h") end, term_opts)
 map("t", "<C-j>", function() smart_move("j") end, term_opts)
 map("t", "<C-k>", function() smart_move("k") end, term_opts)
 map("t", "<C-l>", function() smart_move("l") end, term_opts)
+
+map("n", "<leader>ti", function()
+  local file = vim.api.nvim_buf_get_name(0)
+  if file == "" then
+    vim.notify("No file open", vim.log.levels.WARN)
+    return
+  end
+
+  local cmd = "tig " .. vim.fn.shellescape(file)
+  vim.cmd("tabnew") -- 하단 스플릿 열기
+  vim.cmd("terminal " .. cmd)
+  vim.cmd("startinsert")
+end, { desc = "Tig: Git history of current file" })
+
+vim.api.nvim_create_autocmd("TermOpen", {
+  pattern = "*",
+  callback = function()
+    local buf = vim.api.nvim_get_current_buf()
+
+    vim.keymap.set("t", "<Esc>", function()
+      vim.cmd([[stopinsert]])
+      vim.cmd([[tabclose]])
+    end, { buffer = buf, silent = true })
+  end,
+})
