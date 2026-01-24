@@ -199,21 +199,33 @@ for _, dir in ipairs(directions) do
   end, { noremap = true, silent = true, desc = dir.desc })
 end
 
--- 터미널에서 Ctrl+q로 터미널 닫기
--- 동작: Ctrl+q 누르면 → Insert 모드 종료 → 탭이 여러개면 탭 닫기, 아니면 윈도우 닫기
+-- 터미널 모드에서 스크롤 (마우스 없이)
+-- Ctrl+b: 위로 스크롤 (backward, half page up)
+-- Ctrl+f: 아래로 스크롤 (forward, half page down)
+-- 동작: 터미널 모드 → Normal 모드 → 스크롤 (insert 모드로 자동 복귀 안 함)
+-- Normal 모드에서 j/k로 추가 스크롤 가능, i로 다시 터미널 모드 진입
+map("t", "<C-b>", "<C-\\><C-n><C-u>", { noremap = true, silent = true, desc = "Scroll up (backward)" })
+map("t", "<C-f>", "<C-\\><C-n><C-d>", { noremap = true, silent = true, desc = "Scroll down (forward)" })
+
+-- 터미널에서 Ctrl+q로 터미널 닫기 (모든 모드에서 작동)
+-- 동작: Ctrl+q 누르면 → 탭이 여러개면 탭 닫기, 아니면 윈도우 닫기
 -- 장점: 빠르게 터미널 종료 가능 (일반적인 :q 대신), Esc는 터미널 프로그램에서 정상 동작
 vim.api.nvim_create_autocmd("TermOpen", {
   pattern = "*",
   callback = function()
     local buf = vim.api.nvim_get_current_buf()
-    vim.keymap.set("t", "<C-q>", function()
-      vim.cmd.stopinsert()  -- Insert 모드 종료
+    local close_terminal = function()
+      vim.cmd.stopinsert()  -- Insert 모드 종료 (이미 Normal 모드면 무시됨)
       if vim.fn.tabpagenr("$") > 1 then
         vim.cmd.tabclose()  -- 탭이 2개 이상이면 현재 탭 닫기
       else
         vim.cmd.close()     -- 탭이 1개면 윈도우만 닫기
       end
-    end, { buffer = buf, silent = true, desc = "Close terminal" })
+    end
+
+    -- 터미널 모드와 Normal 모드 둘 다에서 Ctrl+q 작동
+    vim.keymap.set("t", "<C-q>", close_terminal, { buffer = buf, silent = true, desc = "Close terminal" })
+    vim.keymap.set("n", "<C-q>", close_terminal, { buffer = buf, silent = true, desc = "Close terminal" })
   end,
 })
 
