@@ -33,5 +33,9 @@ require("nvim-treesitter.configs").setup({
   indent = {
     enable = true,
   },
+  -- Treesitter 기반 코드 폴딩 활성화
+  fold = {
+    enable = true,
+  },
 })
 

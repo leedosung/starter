@@ -7,6 +7,12 @@ require "nvchad.options"
 --
 vim.opt.whichwrap = "b,s"
 vim.opt.mouse = ""
+vim.opt.autoread = true
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI" }, {
+  command = "if mode() != 'c' | checktime | endif",
+})
+-- vim.opt.mouse = "a"
+-- vim.opt.clipboard = "unnamedplus"
 
 -- gitsigns disable
-vim.opt.signcolumn = "no"
+-- vim.opt.signcolumn = "no"
