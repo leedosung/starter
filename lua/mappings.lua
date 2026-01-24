@@ -14,8 +14,37 @@ map("i", "jk", "<ESC>", { desc = "Exit insert mode" })
 -- LSP 기능
 -- <leader>ca: 현재 커서 위치에서 사용 가능한 코드 액션 표시 (자동 import, 수정 제안 등)
 map("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "LSP code action" })
--- <leader>cf: 현재 버퍼의 코드를 LSP 설정에 따라 자동 포맷
-map("n", "<leader>cf", vim.lsp.buf.format, { desc = "LSP format" })
+-- <leader>cf: 현재 버퍼의 코드를 conform.nvim 설정에 따라 자동 포맷 (stylua, prettier 등)
+map("n", "<leader>cf", function()
+  local conform = require("conform")
+
+  -- 현재 파일타입에 사용 가능한 포맷터 확인
+  local formatters = conform.list_formatters(0)
+
+  if #formatters == 0 then
+    vim.notify("No formatter configured for filetype: " .. vim.bo.filetype, vim.log.levels.WARN)
+    return
+  end
+
+  -- 포맷터 목록 출력
+  local formatter_names = {}
+  for _, f in ipairs(formatters) do
+    table.insert(formatter_names, f.name)
+  end
+  vim.notify("Using formatters: " .. table.concat(formatter_names, ", "), vim.log.levels.INFO)
+
+  -- 포맷 실행
+  conform.format({
+    lsp_fallback = true,
+    timeout_ms = 3000,
+  }, function(err)
+    if err then
+      vim.notify("Format failed: " .. tostring(err), vim.log.levels.ERROR)
+    else
+      vim.notify("Formatted successfully", vim.log.levels.INFO)
+    end
+  end)
+end, { desc = "Format code" })
 
 -- JSON 포맷팅 (jq 명령어 필요)
 -- <leader>jf: 현재 버퍼의 JSON을 예쁘게 포맷 (들여쓰기 적용)
@@ -103,19 +132,38 @@ map("n", "<leader>v", "<cmd>ToggleTerm direction=vertical size=60<CR>", { desc =
 -- <leader>o: 화면 중앙에 플로팅 터미널 열기/닫기
 map("n", "<leader>o", "<cmd>ToggleTerm direction=float size=80<CR>", { desc = "Float terminal" })
 
--- 진단 메시지 표시 토글
--- LSP의 진단 메시지(에러, 경고, 힌트 등)의 표시 수준을 토글
--- false: 에러만 표시 (깔끔한 화면)
--- true: 모든 수준의 진단 표시 (힌트, 정보, 경고, 에러 모두)
+-- 진단 메시지 표시 토글 (<leader>l)
+-- LSP/Linter의 진단 메시지 표시 수준을 토글
+--
+-- 진단 레벨 약어:
+--   E (Error)       - 빨간색: 반드시 수정해야 하는 오류
+--   W (Warning)     - 노란색: 잠재적 문제, 수정 권장
+--   H (Hint)        - 하늘색: 개선 제안, 선택사항
+--   I (Information) - 회색: 참고 사항
+--
+-- 토글 동작:
+--   false (기본값): 에러(E)만 표시 - 깔끔한 화면
+--   true: 모든 레벨 표시 (E, W, H, I) - 상세 정보
 local show_other_diagnostics = false
 
+-- 초기 설정: 에러만 표시
+vim.diagnostic.config({
+  virtual_text = {
+    severity = { min = vim.diagnostic.severity.ERROR, max = vim.diagnostic.severity.ERROR }
+  },
+  signs = false,
+  underline = true,
+})
+vim.opt.signcolumn = "no"
+
+-- <leader>l: 진단 레벨 토글 (에러만 ↔ 모든 레벨)
 map("n", "<Leader>l", function()
   show_other_diagnostics = not show_other_diagnostics
 
   -- 표시할 진단 메시지의 심각도 범위 설정
   local severity = show_other_diagnostics
-    and { min = vim.diagnostic.severity.HINT, max = vim.diagnostic.severity.ERROR }  -- 모든 레벨
-    or { min = vim.diagnostic.severity.ERROR, max = vim.diagnostic.severity.ERROR }  -- 에러만
+    and { min = vim.diagnostic.severity.HINT, max = vim.diagnostic.severity.ERROR }  -- 모든 레벨 (H, I, W, E)
+    or { min = vim.diagnostic.severity.ERROR, max = vim.diagnostic.severity.ERROR }  -- 에러만 (E)
 
   vim.diagnostic.config({
     virtual_text = { severity = severity },  -- 코드 끝에 표시되는 진단 메시지
@@ -123,7 +171,7 @@ map("n", "<Leader>l", function()
     underline = true,                        -- 문제가 있는 코드에 밑줄 표시
   })
   vim.opt.signcolumn = show_other_diagnostics and "yes" or "no"  -- 사인 컬럼 표시 토글
-end, { desc = "Toggle diagnostics (errors only/all)" })
+end, { desc = "Toggle diagnostics (E only ↔ E,W,H,I)" })
 
 -- 터미널 관련 키맵 및 동작 설정
 

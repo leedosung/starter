@@ -38,7 +38,7 @@ Plugins follow this pattern:
 ## Key Customizations
 
 ### LSP Servers (lua/configs/lspconfig.lua)
-Enabled LSP servers: html, cssls, ts_ls, eslint, clangd, jsonls, bashls, yamlls, marksman, lua_ls, terraformls, dockerls
+Enabled LSP servers: html, cssls, ts_ls, eslint, clangd, gopls, rust_analyzer, jsonls, bashls, yamlls, marksman, lua_ls, terraformls, dockerls
 
 ### Formatters (lua/configs/conform.lua)
 - Lua: stylua
@@ -50,6 +50,14 @@ Enabled LSP servers: html, cssls, ts_ls, eslint, clangd, jsonls, bashls, yamlls,
 
 Format on save is disabled by default (commented out in conform.lua).
 
+### Linters (lua/configs/lint.lua)
+Additional code quality checks beyond LSP:
+- Shell: shellcheck (best practices, common errors)
+- YAML: yamllint (indentation, syntax, style)
+- Markdown: markdownlint (style, links, structure)
+
+Note: ESLint runs as LSP server, not as linter (no duplication).
+
 ### Treesitter Parsers (lua/configs/treesitter.lua)
 Auto-installs parsers for: vim, lua, html, css, json, javascript, typescript, bash, markdown, yaml, dockerfile, toml, go, python, rust, c, cpp, sql, hcl, graphql, prisma
 
@@ -57,6 +65,29 @@ Modules enabled:
 - `highlight`: Syntax highlighting
 - `indent`: Smart indentation
 - `fold`: Code folding support
+- `incremental_selection`: Progressive selection expansion/reduction
+- `textobjects`: Smart selection, navigation, and manipulation of code structures
+
+**Incremental Selection** (expand/reduce selection progressively):
+- `Ctrl+Space` - Initialize selection and expand (word → expression → function → class)
+- `Ctrl+s` - Expand to outer scope
+- `Backspace` - Reduce selection
+
+**Textobjects - Select** (visual mode shortcuts):
+- Functions: `vaf` (outer), `vif` (inner)
+- Classes: `vac` (outer), `vic` (inner)
+- Conditionals: `vai` (outer), `vii` (inner)
+- Loops: `val` (outer), `vil` (inner)
+- Parameters: `vaa` (with comma), `via` (value only)
+
+**Textobjects - Move** (navigate between code structures):
+- Functions: `]m` / `[m` (next/previous start), `]M` / `[M` (next/previous end)
+- Classes: `]c` / `[c` (next/previous start), `]C` / `[C` (next/previous end)
+- Parameters: `]a` / `[a` (next/previous)
+
+**Textobjects - Swap** (exchange parameters):
+- `<leader>a` - Swap current parameter with next
+- `<leader>A` - Swap current parameter with previous
 
 ### Code Folding
 - Uses Treesitter-based folding (foldmethod = expr, foldexpr = v:lua.vim.treesitter.foldexpr())

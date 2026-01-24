@@ -4,7 +4,11 @@ require "nvchad.options"
 
 -- local o = vim.o
 -- o.cursorlineopt ='both' -- to enable cursorline!
---
+
+-- Mason bin 디렉토리를 PATH에 추가 (conform.nvim이 포맷터를 찾을 수 있도록)
+local mason_bin = vim.fn.stdpath("data") .. "/mason/bin"
+vim.env.PATH = mason_bin .. ":" .. vim.env.PATH
+
 vim.opt.whichwrap = "b,s"
 vim.opt.mouse = ""
 vim.opt.autoread = true
