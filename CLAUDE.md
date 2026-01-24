@@ -85,10 +85,6 @@ Modules enabled:
 - `<leader>aa` - Accept diff
 - `<leader>ad` - Deny diff
 
-**Avante** (lua/plugins/avante.lua) - Currently disabled
-- Configured for Claude Sonnet 4 and Moonshot Kimi K2
-- Instructions file: avante.md (if exists)
-
 **Copilot** (lua/plugins/copilot.lua) - Enabled
 - Integrated with nvim-cmp for completions
 - Suggestion and panel UI disabled in favor of cmp integration
