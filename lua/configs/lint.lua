@@ -20,6 +20,10 @@ lint.linters_by_ft = {
 -- 파일 열기, 저장, 편집 시 자동으로 linter 실행
 vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
   callback = function()
+    -- .env 파일에서는 shellcheck 실행하지 않음
+    if vim.b.is_env_file then
+      return
+    end
     lint.try_lint()
   end,
 })

@@ -66,3 +66,14 @@ end
 vim.api.nvim_create_autocmd({"BufEnter", "BufReadPost", "TextChanged", "TextChangedI"}, {
   callback = detect_filetype,
 })
+
+-- .env 파일을 sh 타입으로 설정 (bash treesitter로 구문 강조)
+-- shell로 인식되지만 shellcheck는 lint.lua에서 제외됨
+vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
+  pattern = {".env", ".env.*", "*.env"},
+  callback = function()
+    vim.bo.filetype = "sh"
+    -- .env 파일임을 표시 (lint 설정에서 사용)
+    vim.b.is_env_file = true
+  end,
+})

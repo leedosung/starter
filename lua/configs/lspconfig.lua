@@ -22,4 +22,24 @@ local servers = {
 -- LSP 서버 활성화 (Neovim 0.10+ 내장 함수)
 vim.lsp.enable(servers)
 
+-- lua_ls 추가 설정: Neovim 환경 인식
+vim.lsp.config("lua_ls", {
+  settings = {
+    Lua = {
+      diagnostics = {
+        -- vim을 글로벌로 인식 (undefined global 경고 제거)
+        globals = { "vim" },
+      },
+      workspace = {
+        -- Neovim 런타임 파일 인식
+        library = vim.api.nvim_get_runtime_file("", true),
+        checkThirdParty = false, -- 외부 라이브러리 확인 비활성화 (속도 향상)
+      },
+      telemetry = {
+        enable = false, -- 텔레메트리 비활성화
+      },
+    },
+  },
+})
+
 -- LSP 서버 옵션 변경: :h vim.lsp.config 참고 
