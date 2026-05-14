@@ -146,9 +146,11 @@ Modules enabled:
 - `<leader>o` - Float terminal (size: 80)
 
 **Git Integration**:
-- `<leader>gh` - Git file history (Diffview - read-only, safe)
-- `<leader>gt` - Tig log for the whole repo (floating terminal, toggles)
-- `<leader>gT` - Tig log for the current file (floating terminal)
+- `<leader>gh` - Git file history (Diffview - opens in a new tab, read-only, safe)
+- `<leader>gb` - Telescope picker of commits touching the current file (floating, no tab)
+- `<leader>gn` - Neogit log scoped to the current file (current window, no tab)
+- `<leader>gt` - Tig log for the current file (floating terminal)
+- `<leader>gT` - Tig log for the whole repo (floating terminal, toggles)
 - `<leader>gs` - Tig status, interactive staging/commit (floating terminal, toggles)
 
 **Window Navigation**: `<C-h/j/k/l>` works in both normal and terminal mode for seamless window switching

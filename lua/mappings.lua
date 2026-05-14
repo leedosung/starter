@@ -230,8 +230,15 @@ vim.api.nvim_create_autocmd("TermOpen", {
 })
 
 -- Git 관련 키매핑 (Diffview 사용)
--- <leader>gh: 현재 파일의 Git 히스토리를 Diffview로 표시 (읽기 전용, 안전)
-map("n", "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", { desc = "Git file history" })
+-- <leader>gh: 현재 파일의 Git 히스토리를 Diffview로 표시 (읽기 전용, 안전, 새 탭)
+map("n", "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", { desc = "Git file history (Diffview)" })
+
+-- <leader>gb: 현재 파일의 git 커밋 히스토리를 Telescope picker로 표시 (탭 없이 플로팅)
+map("n", "<leader>gb", "<cmd>Telescope git_bcommits<cr>", { desc = "Git buffer commits (Telescope)" })
+
+-- <leader>gn: 현재 파일 범위로 Neogit log 뷰 열기 (현재 윈도우, 새 탭 X)
+-- 참고: Neogit 버전에 따라 `-- %` 경로 필터가 무시될 수 있음. 그럴 땐 팝업에서 직접 선택
+map("n", "<leader>gn", "<cmd>Neogit log -- %<cr>", { desc = "Neogit log (current file)" })
 
 -- Tig: 텍스트 기반 git 히스토리 뷰어 (외부 도구 tig 필요)
 -- toggleterm의 플로팅 터미널로 띄움. 같은 키를 다시 누르면 토글로 닫힘.
@@ -256,14 +263,14 @@ local function tig_float(cmd, key)
   tig_terminals[key]:toggle()
 end
 
--- <leader>gt: 전체 저장소의 git log를 tig로 보기
-map("n", "<leader>gt", function() tig_float("tig", "log") end, { desc = "Tig log (repo)" })
+-- <leader>gT: 전체 저장소의 git log를 tig로 보기
+map("n", "<leader>gT", function() tig_float("tig", "log") end, { desc = "Tig log (repo)" })
 
 -- <leader>gs: tig status (인터랙티브 스테이징/커밋 인터페이스)
 map("n", "<leader>gs", function() tig_float("tig status", "status") end, { desc = "Tig status" })
 
--- <leader>gT: 현재 파일의 git 히스토리를 tig로 보기 (파일이 바뀔 수 있으므로 매번 새 인스턴스)
-map("n", "<leader>gT", function()
+-- <leader>gt: 현재 파일의 git 히스토리를 tig로 보기 (파일이 바뀔 수 있으므로 매번 새 인스턴스)
+map("n", "<leader>gt", function()
   local file = vim.fn.expand "%:p"
   if file == "" then
     vim.notify("No file in current buffer", vim.log.levels.WARN)
