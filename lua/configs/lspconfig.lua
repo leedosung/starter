@@ -19,10 +19,8 @@ local servers = {
   "dockerls"     -- Dockerfile: 컨테이너 이미지 빌드 스크립트
 }
 
--- LSP 서버 활성화 (Neovim 0.10+ 내장 함수)
-vim.lsp.enable(servers)
-
 -- lua_ls 추가 설정: Neovim 환경 인식
+-- 주의: vim.lsp.enable() 호출 전에 설정해야 시작 시점부터 반영됨
 vim.lsp.config("lua_ls", {
   settings = {
     Lua = {
@@ -41,5 +39,8 @@ vim.lsp.config("lua_ls", {
     },
   },
 })
+
+-- LSP 서버 활성화 (Neovim 0.10+ 내장 함수)
+vim.lsp.enable(servers)
 
 -- LSP 서버 옵션 변경: :h vim.lsp.config 참고 

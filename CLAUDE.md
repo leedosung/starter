@@ -6,6 +6,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a personal Neovim configuration based on NvChad v2.5. NvChad is used as a plugin (imported from NvChad/NvChad), with custom configurations extending its base functionality. The configuration follows NvChad's modular structure where you import base modules and override/extend them.
 
+## Common Commands
+
+This repo has no traditional build/test/lint pipeline — it is loaded by Neovim at startup. Use these in-editor commands to manage and verify the config:
+
+- `:Lazy` - Open lazy.nvim UI (sync/update/install/clean plugins). `lazy-lock.json` pins plugin versions; commit it after intentional updates.
+- `:Lazy sync` - Install missing plugins and update existing ones to match `lazy-lock.json` / specs.
+- `:Lazy update` - Pull latest versions of plugins (then commit `lazy-lock.json`).
+- `:Mason` - Open Mason UI to install/uninstall LSP servers, formatters, linters.
+- `:MasonInstall <pkg>` - Install a Mason package (e.g. `:MasonInstall stylua`).
+- `:TSUpdate` - Update Treesitter parsers (parsers listed in `lua/configs/treesitter.lua`).
+- `:LspInfo` - Inspect attached LSP clients for the current buffer.
+- `:ConformInfo` - Inspect conform.nvim formatter status.
+- `:checkhealth` - Diagnose Neovim/plugin/runtime issues. Use `:checkhealth lazy`, `:checkhealth mason`, etc. to scope.
+- `nvim --headless "+Lazy! sync" +qa` - Headless plugin sync (useful when verifying changes from the shell).
+
+After editing any `lua/` file, reload by restarting Neovim — there is no hot-reload step.
+
 ## Architecture
 
 ### Configuration Loading Order
@@ -115,6 +132,7 @@ Modules enabled:
 - `<leader>as` - Send to Claude (visual mode)
 - `<leader>aa` - Accept diff
 - `<leader>ad` - Deny diff
+- `<leader>av` - Send `/review` command with file:line info (normal: current line, visual: selection range)
 
 **Copilot** (lua/plugins/copilot.lua) - Enabled
 - Integrated with nvim-cmp for completions
@@ -129,6 +147,9 @@ Modules enabled:
 
 **Git Integration**:
 - `<leader>gh` - Git file history (Diffview - read-only, safe)
+- `<leader>gt` - Tig log for the whole repo (floating terminal, toggles)
+- `<leader>gT` - Tig log for the current file (floating terminal)
+- `<leader>gs` - Tig status, interactive staging/commit (floating terminal, toggles)
 
 **Window Navigation**: `<C-h/j/k/l>` works in both normal and terminal mode for seamless window switching
 
@@ -170,6 +191,7 @@ Modules enabled:
 - Supported formats: JSON, XML, YAML
 - Triggers on BufEnter, BufReadPost, TextChanged, and TextChangedI events
 - Enables syntax highlighting without manual filetype setting
+- `.env` files are set to `sh` filetype for syntax highlighting, but excluded from shellcheck linting
 
 ### Theme & UI
 
@@ -194,4 +216,5 @@ When making changes to this config:
 - Plugin specs use lazy.nvim syntax
 - Format on save is intentionally disabled
 - Sign column and gitsigns can be toggled (commented code exists in options.lua)
-- The config expects certain external tools: jq, jwt-cli, xmllint, glow, shfmt
+- The config expects certain external tools: jq, jwt-cli, xmllint, glow, shfmt, shellcheck, yamllint, markdownlint, stylua, prettier, yq
+- LSP servers, formatters, and linters are installed via Mason — keep `lua/configs/lspconfig.lua`, `conform.lua`, and `lint.lua` in sync with what's actually installed

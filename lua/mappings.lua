@@ -233,6 +233,55 @@ vim.api.nvim_create_autocmd("TermOpen", {
 -- <leader>gh: 현재 파일의 Git 히스토리를 Diffview로 표시 (읽기 전용, 안전)
 map("n", "<leader>gh", "<cmd>DiffviewFileHistory %<cr>", { desc = "Git file history" })
 
+-- Tig: 텍스트 기반 git 히스토리 뷰어 (외부 도구 tig 필요)
+-- toggleterm의 플로팅 터미널로 띄움. 같은 키를 다시 누르면 토글로 닫힘.
+-- repo/status 터미널은 캐시해서 재사용, 파일 히스토리는 현재 파일 기준으로 매번 새로 생성
+local tig_terminals = {}
+
+local function tig_float(cmd, key)
+  if not tig_terminals[key] then
+    local Terminal = require("toggleterm.terminal").Terminal
+    tig_terminals[key] = Terminal:new {
+      cmd = cmd,
+      direction = "float",
+      float_opts = {
+        border = "curved",
+        width = math.floor(vim.o.columns * 0.9),
+        height = math.floor(vim.o.lines * 0.9),
+      },
+      close_on_exit = true,
+      hidden = true,
+    }
+  end
+  tig_terminals[key]:toggle()
+end
+
+-- <leader>gt: 전체 저장소의 git log를 tig로 보기
+map("n", "<leader>gt", function() tig_float("tig", "log") end, { desc = "Tig log (repo)" })
+
+-- <leader>gs: tig status (인터랙티브 스테이징/커밋 인터페이스)
+map("n", "<leader>gs", function() tig_float("tig status", "status") end, { desc = "Tig status" })
+
+-- <leader>gT: 현재 파일의 git 히스토리를 tig로 보기 (파일이 바뀔 수 있으므로 매번 새 인스턴스)
+map("n", "<leader>gT", function()
+  local file = vim.fn.expand "%:p"
+  if file == "" then
+    vim.notify("No file in current buffer", vim.log.levels.WARN)
+    return
+  end
+  local Terminal = require("toggleterm.terminal").Terminal
+  Terminal:new({
+    cmd = "tig " .. vim.fn.shellescape(file),
+    direction = "float",
+    float_opts = {
+      border = "curved",
+      width = math.floor(vim.o.columns * 0.9),
+      height = math.floor(vim.o.lines * 0.9),
+    },
+    close_on_exit = true,
+  }):toggle()
+end, { desc = "Tig (current file history)" })
+
 -- 마우스 모드 토글
 -- <leader>me: 마우스 사용 ON/OFF 전환
 -- ON(a): 마우스로 커서 이동, 텍스트 선택, 윈도우 크기 조절 가능
@@ -242,3 +291,55 @@ map("n", "<leader>me", function()
   vim.opt.mouse = is_enabled and "" or "a"
   vim.notify(is_enabled and "Mouse disabled" or "Mouse enabled", vim.log.levels.INFO)
 end, { desc = "Toggle mouse mode" })
+
+-- Claude Code 터미널에 텍스트 직접 전송하는 헬퍼 함수
+-- Claude 터미널 버퍼를 찾아서 job_id로 텍스트를 전송
+local function send_to_claude_terminal(text)
+  -- 모든 버퍼 순회하여 Claude 터미널 찾기
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].buftype == "terminal" then
+      local buf_name = vim.api.nvim_buf_get_name(buf)
+      -- Claude Code 터미널 식별 (snacks.nvim이 생성한 claude 터미널)
+      if buf_name:match("claude") or buf_name:match("Claude") then
+        local job_id = vim.b[buf].terminal_job_id
+        if job_id then
+          vim.api.nvim_chan_send(job_id, text .. "\n")
+          -- 터미널 포커스 (선택사항)
+          local wins = vim.fn.win_findbuf(buf)
+          if #wins > 0 then
+            vim.api.nvim_set_current_win(wins[1])
+            vim.cmd("startinsert")
+          end
+          return true
+        end
+      end
+    end
+  end
+  vim.notify("Claude terminal not found. Open it first with <leader>ac", vim.log.levels.WARN)
+  return false
+end
+
+-- <leader>av: /review 명령어를 Claude 터미널에 전송
+-- Normal mode: 현재 파일과 커서 라인 정보와 함께 /review 전송
+map("n", "<leader>av", function()
+  local file = vim.fn.expand("%:p")
+  local line = vim.fn.line(".")
+  local cmd = "/review " .. file .. ":" .. line
+  send_to_claude_terminal(cmd)
+end, { desc = "Send /review to Claude (current line)" })
+
+-- Visual mode: 선택 범위와 함께 /review 전송
+map("v", "<leader>av", function()
+  local file = vim.fn.expand("%:p")
+  -- Visual 선택 범위 가져오기
+  local start_line = vim.fn.line("v")
+  local end_line = vim.fn.line(".")
+  -- 시작과 끝 정렬 (위에서 아래로)
+  if start_line > end_line then
+    start_line, end_line = end_line, start_line
+  end
+  local cmd = "/review " .. file .. ":" .. start_line .. "-" .. end_line
+  -- Visual 모드 종료 후 전송
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
+  send_to_claude_terminal(cmd)
+end, { desc = "Send /review to Claude (selection)" })
